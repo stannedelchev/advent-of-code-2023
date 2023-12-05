@@ -20,8 +20,18 @@ impl Problem for Day02 {
             .to_string()
     }
 
-    fn part2(&self, _: Lines) -> String {
-        "".to_string()
+    fn part2(&self, lines: Lines) -> String {
+        lines
+            .map(Day02::get_id_and_subsets)
+            .map(|m| {
+                let (_, cube_subsets) = m;
+                let max_red = Day02::max_for_color(&cube_subsets, "red");
+                let max_green = Day02::max_for_color(&cube_subsets, "green");
+                let max_blue = Day02::max_for_color(&cube_subsets, "blue");
+                max_red * max_green * max_blue
+            })
+            .sum::<u32>()
+            .to_string()
     }
 }
 
