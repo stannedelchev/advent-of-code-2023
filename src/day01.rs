@@ -1,12 +1,12 @@
 use std::str::Lines;
 
-use aho_corasick::automaton::Candidate::Match;
+use crate::problem::Problem;
 use aho_corasick::AhoCorasick;
 
 pub struct Day01 {}
 
-impl Day01 {
-    pub fn part1(&self, lines: Lines) -> String {
+impl Problem for Day01 {
+    fn part1(&self, lines: Lines) -> String {
         lines
             .map(|line| {
                 let mut numbers = line.chars().filter(|c| c.is_numeric());
@@ -21,11 +21,7 @@ impl Day01 {
             .to_string()
     }
 
-    fn parse_char(c: char) -> u32 {
-        c.to_digit(10).unwrap()
-    }
-
-    pub fn part2(&self, lines: Lines) -> String {
+    fn part2(&self, lines: Lines) -> String {
         let patterns = &[
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "one", "two", "three", "four",
             "five", "six", "seven", "eight", "nine",
@@ -43,6 +39,12 @@ impl Day01 {
             })
             .sum::<u32>()
             .to_string()
+    }
+}
+
+impl Day01 {
+    fn parse_char(c: char) -> u32 {
+        c.to_digit(10).unwrap()
     }
 
     fn parse_digit(str: &str) -> u32 {
