@@ -7,15 +7,17 @@ use std::time::{Duration, Instant};
 
 use crate::day01::Day01;
 use crate::day02::Day02;
+use crate::day03::Day03;
 use crate::problem::Problem;
 
 mod day01;
 mod day02;
+mod day03;
 mod problem;
 
 fn main() {
     let part_runs = parse_run_args(env::args());
-    let problems: Vec<&dyn Problem> = vec![&Day01 {}, &Day02 {}];
+    let problems: Vec<&dyn Problem> = vec![&Day01 {}, &Day02 {}, &Day03 {}];
 
     println!("Running each part {} time(s).", part_runs);
 
