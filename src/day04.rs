@@ -1,5 +1,7 @@
-use std::collections::HashSet;
 use std::str::{FromStr, Lines};
+
+use itertools::Itertools;
+use tinyset::Set64;
 
 use crate::problem::Problem;
 
@@ -16,13 +18,26 @@ impl Problem for Day04 {
     }
 
     fn part2(&self, lines: Lines) -> String {
-        "".to_string()
+        let cards = lines.map(|l| l.parse::<Card>().unwrap()).collect_vec();
+        let mut cards_count = vec![1; cards.len()];
+        let mut total = 0;
+
+        for (idx, card) in cards.iter().enumerate() {
+            let matches = card.matches();
+            for i in 1..=matches {
+                cards_count[idx + i as usize] += cards_count[idx];
+            }
+
+            total += cards_count[idx];
+        }
+
+        total.to_string()
     }
 }
 
 impl Day04 {
-    fn numbers(str: &str) -> HashSet<u32> {
-        HashSet::from_iter(
+    fn numbers(str: &str) -> Set64<u32> {
+        Set64::from_iter(
             str.split_whitespace()
                 .map(str::parse::<u32>)
                 .map(Result::unwrap),
@@ -31,24 +46,20 @@ impl Day04 {
 }
 
 struct Card {
-    number: u32,
-    winning_numbers: HashSet<u32>,
-    my_numbers: HashSet<u32>,
-    points: Option<u32>,
+    winning_numbers: Set64<u32>,
+    my_numbers: Set64<u32>,
 }
 
 impl FromStr for Card {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let number = s[4..8].trim().parse::<u32>().unwrap();
         let winning_numbers = Day04::numbers(&s[9..40]);
         let my_numbers = Day04::numbers(&s[41..]);
+
         Ok(Card {
-            number,
             winning_numbers,
             my_numbers,
-            points: None,
         })
     }
 }
@@ -61,7 +72,10 @@ impl Card {
             .fold(0_u32, |acc, _| if acc == 0 { 1 } else { acc * 2 })
     }
 
-    fn points_mut(&mut self) {
-        self.points = Some(self.points());
+    fn matches(&self) -> u32 {
+        self.winning_numbers
+            .iter()
+            .filter(|n| self.my_numbers.contains(n))
+            .count() as u32
     }
 }
