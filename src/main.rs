@@ -42,7 +42,7 @@ fn main() {
 
 fn parse_run_args(args: Args) -> u32 {
     let args = args.collect::<Vec<String>>();
-    args.get(2)
+    args.get(1)
         .unwrap_or(&"1".to_string())
         .parse::<u32>()
         .unwrap_or(1)
