@@ -14,15 +14,7 @@ impl Problem for Day03 {
             .map(|(idx, line)| line.engine_parts(idx).collect::<Vec<EnginePartOrSymbol>>())
             .flatten();
 
-        let mut parts: Vec<EnginePart> = vec![];
-        let mut symbols: Vec<Symbol> = vec![];
-
-        for part_or_symbol in parsed {
-            match part_or_symbol {
-                EnginePartOrSymbol::Part(p) => parts.push(p),
-                EnginePartOrSymbol::Symbol(s) => symbols.push(s),
-            }
-        }
+        let (symbols, parts) = Day03::symbols_and_parts(parsed);
 
         symbols
             .iter()
@@ -38,7 +30,47 @@ impl Problem for Day03 {
     }
 
     fn part2(&self, lines: Lines) -> String {
-        "".to_string()
+        let parsed = lines
+            .enumerate()
+            .map(|(idx, line)| line.engine_parts(idx).collect::<Vec<EnginePartOrSymbol>>())
+            .flatten();
+
+        let (symbols, parts) = Day03::symbols_and_parts(parsed);
+
+        symbols
+            .iter()
+            .filter(|s| s.data == '*')
+            .filter_map(|s| {
+                let neighbours = parts
+                    .iter()
+                    .filter(|p| p.adjacent(s))
+                    .collect::<Vec<&EnginePart>>();
+                match neighbours.len() {
+                    2 => Some(neighbours[0].data * neighbours[1].data),
+                    _ => None,
+                }
+            })
+            .sum::<usize>()
+            .to_string()
+    }
+}
+
+impl Day03 {
+    fn symbols_and_parts<I>(data: I) -> (Vec<Symbol>, Vec<EnginePart>)
+    where
+        I: Iterator<Item = EnginePartOrSymbol>,
+    {
+        let mut parts: Vec<EnginePart> = vec![];
+        let mut symbols: Vec<Symbol> = vec![];
+
+        for part_or_symbol in data {
+            match part_or_symbol {
+                EnginePartOrSymbol::Part(p) => parts.push(p),
+                EnginePartOrSymbol::Symbol(s) => symbols.push(s),
+            }
+        }
+
+        (symbols, parts)
     }
 }
 
@@ -48,12 +80,12 @@ enum EnginePartOrSymbol {
 }
 
 trait EnginePartParser {
-    fn engine_parts(self: &Self, start_y: usize) -> EnginePartIterator;
+    fn engine_parts(self: &Self, y: usize) -> EnginePartIterator;
 }
 
 impl EnginePartParser for &str {
-    fn engine_parts<'a>(self: &'a Self, start_y: usize) -> EnginePartIterator<'a> {
-        EnginePartIterator::new(self, start_y)
+    fn engine_parts<'a>(self: &'a Self, y: usize) -> EnginePartIterator<'a> {
+        EnginePartIterator::new(self, y)
     }
 }
 
@@ -96,9 +128,13 @@ impl Iterator for EnginePartIterator<'_> {
                         y: self.y,
                     }));
                 }
-                _ => {
+                c => {
                     self.line_chars.next();
-                    return Some(EnginePartOrSymbol::Symbol(Symbol { x: idx, y: self.y }));
+                    return Some(EnginePartOrSymbol::Symbol(Symbol {
+                        data: c,
+                        x: idx,
+                        y: self.y,
+                    }));
                 }
             }
         }
@@ -117,6 +153,7 @@ struct EnginePart {
 
 #[derive(Debug)]
 struct Symbol {
+    data: char,
     x: usize,
     y: usize,
 }
@@ -128,7 +165,6 @@ impl EnginePart {
             return s.x == self.end_x || (s.x as isize == self.start_x as isize - 1);
         }
 
-        // part below symbol
         if s.y as isize == self.y as isize - 1 || s.y == self.y + 1 {
             return (self.start_x as isize - 1..self.end_x as isize + 1).contains(&(s.x as isize));
         }
