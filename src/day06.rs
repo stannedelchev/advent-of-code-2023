@@ -49,7 +49,7 @@ impl Day06 {
             .map(&str::parse::<u64>)
             .map(Result::unwrap)
     }
-    #[allow(dead_code)]
+
     fn combine_numbers(line: &str) -> u64 {
         let x = line
             .split_once(':')
