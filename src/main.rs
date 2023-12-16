@@ -10,6 +10,7 @@ use crate::day02::Day02;
 use crate::day03::Day03;
 use crate::day04::Day04;
 use crate::day05::Day05;
+use crate::day06::Day06;
 use crate::problem::Problem;
 
 mod day01;
@@ -17,11 +18,19 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
+mod day06;
 mod problem;
 
 fn main() {
     let part_runs = parse_run_args(env::args());
-    let problems: Vec<&dyn Problem> = vec![&Day01 {}, &Day02 {}, &Day03 {}, &Day04 {}, &Day05 {}];
+    let problems: Vec<&dyn Problem> = vec![
+        &Day01 {},
+        &Day02 {},
+        &Day03 {},
+        &Day04 {},
+        &Day05 {},
+        &Day06 {},
+    ];
 
     println!("Running each part {} time(s).", part_runs);
 
